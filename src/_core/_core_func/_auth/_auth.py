@@ -63,3 +63,30 @@ class Authentication:
                 headers={"WWW-Authenticate": "Bearer"},
             )
         return True
+
+    def _verify_room_control(self, request, room) -> bool:
+        """Allow the server API key or this room's control credential."""
+        provided_key = request.headers.get("Authorization", "")
+        if not provided_key:
+            raise web.HTTPUnauthorized(
+                text="Room control credential required",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        accepted = (
+            f"Bearer {self.auth_key}",
+            f"Bearer {getattr(room, 'control_token', '')}",
+        )
+        if not any(
+            hmac.compare_digest(
+                provided_key.encode("utf-8"),
+                key.encode("utf-8"),
+            )
+            for key in accepted
+            if key != "Bearer "
+        ):
+            raise web.HTTPUnauthorized(
+                text="Invalid room control credential",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return True
