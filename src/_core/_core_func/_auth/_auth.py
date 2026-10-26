@@ -49,6 +49,7 @@ class Authentication:
         accepted = (
             f"Bearer {self.auth_key}",
             f"Bearer {getattr(room, 'viewer_token', '')}",
+            f"Bearer {getattr(room, 'control_token', '')}",
         )
         if not any(
             hmac.compare_digest(
