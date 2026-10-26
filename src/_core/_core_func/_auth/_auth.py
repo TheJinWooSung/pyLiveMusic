@@ -50,7 +50,14 @@ class Authentication:
             f"Bearer {self.auth_key}",
             f"Bearer {getattr(room, 'viewer_token', '')}",
         )
-        if not any(hmac.compare_digest(provided_key, key) for key in accepted if key != "Bearer "):
+        if not any(
+            hmac.compare_digest(
+                provided_key.encode("utf-8"),
+                key.encode("utf-8"),
+            )
+            for key in accepted
+            if key != "Bearer "
+        ):
             raise web.HTTPUnauthorized(
                 text="Invalid room access credential",
                 headers={"WWW-Authenticate": "Bearer"},
