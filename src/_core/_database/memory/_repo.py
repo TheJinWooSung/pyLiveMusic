@@ -3,11 +3,12 @@ class MemoryRoomRepository:
     def __init__(self, rooms):
         self.rooms = rooms
 
-    async def create(self, room_id, name, controllers):
+    async def create(self, room_id, name, controllers, viewer_token=None):
         document = {
             "_id": room_id,
             "name": name,
             "controllers": list(controllers),
+            "viewer_token": viewer_token,
         }
 
         self.rooms[room_id] = document
