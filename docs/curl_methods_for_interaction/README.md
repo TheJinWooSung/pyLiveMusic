@@ -26,7 +26,7 @@ Replace `<key>` with the same `AUTH_KEY` configured for the server and caller. T
 
 ## Create a room
 
-Creates a live room and persists its metadata. The response includes `player_token` and `player_path`; share `https://your-host.example` + `player_path` with listeners. Keep the invite private.
+Creates a live room and persists its metadata. The response includes `control_token` for room controls, plus `player_token` and `player_path` for listening. Share `https://your-host.example` + `player_path` with listeners; keep `control_token` private.
 
 ```bash
 curl -X POST http://localhost:8000/api/rooms \
