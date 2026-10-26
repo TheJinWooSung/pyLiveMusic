@@ -43,7 +43,9 @@ if __name__ == "__main__":
 - Do not publish the key, commit it to source control, or print it in logs.
 - If another service needs to call the API, configure the same strong `AUTH_KEY` in the server and caller.
 - Serve the application behind HTTPS in production.
-- The built-in browser player currently reads room state and uses WebRTC signaling endpoints without a bearer token. Treat room IDs as shareable access links, and do not expose this server to untrusted users if rooms must be confidential. Full per-room invitation authorization is not yet implemented.
+- Room creation returns a one-time-to-share player credential (`player_token`) and a relative invite path (`player_path`). Share the path as `https://your-host.example` + `player_path`; its `#token` fragment is read by the browser and sent only in authorization headers.
+- The browser player requires the room-specific credential for room-state reads and WebRTC signaling. The server-wide `AUTH_KEY` remains required for room creation, playback controls, and queue management.
+- Keep player invite links private and use HTTPS in production. Anyone with a room invite link can listen to that room; the token is not a substitute for user identity or revocation.
 - Only provide track paths from trusted sources. The queue API accepts a server-side file path; never let untrusted users submit arbitrary paths.
 
 ## Documentation
