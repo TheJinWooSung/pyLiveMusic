@@ -20,8 +20,8 @@ async def create_room(request):
 
 
 async def get_room(request):
-    request.app["auth"]._verify(request)
-
+    # Public read is currently required by the built-in browser player,
+    # which polls this endpoint without an Authorization header.
     room_id = request.match_info["room_id"]
     room = request.app["state"].rooms.get(room_id)
 
