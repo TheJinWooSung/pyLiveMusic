@@ -1,12 +1,17 @@
 from aiohttp import web
 
 
-async def get_queue(request):
+def get_room_for_control(request):
     room = request.app["state"].rooms.get(request.match_info["room_id"])
     if room is None:
         raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
 
     request.app["auth"]._verify_room_control(request, room)
+    return room
+
+
+async def get_queue(request):
+    room = get_room_for_control(request)
 
     return web.json_response({
         "room_id": room.id,
@@ -22,11 +27,7 @@ async def get_queue(request):
 
 
 async def add_track(request):
-    request.app["auth"]._verify(request)
-
-    room = request.app["state"].rooms.get(request.match_info["room_id"])
-    if room is None:
-        raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
+    room = get_room_for_control(request)
 
     data = await request.json()
     if not isinstance(data, dict):
@@ -47,11 +48,7 @@ async def add_track(request):
 
 
 async def remove_track(request):
-    request.app["auth"]._verify(request)
-
-    room = request.app["state"].rooms.get(request.match_info["room_id"])
-    if room is None:
-        raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
+    room = get_room_for_control(request)
 
     track_id = request.match_info["track_id"]
     async with room.lock:
@@ -66,11 +63,7 @@ async def remove_track(request):
 
 
 async def clear_queue(request):
-    request.app["auth"]._verify(request)
-
-    room = request.app["state"].rooms.get(request.match_info["room_id"])
-    if room is None:
-        raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
+    room = get_room_for_control(request)
 
     async with room.lock:
         room.queue.clear()
