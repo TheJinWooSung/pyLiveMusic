@@ -29,12 +29,14 @@ class Room:
         controllers,
         on_empty,
         viewer_token=None,
+        control_token=None,
     ):
         self.id = room_id
         self.name = name
 
         self.controllers = set(controllers)
         self.viewer_token = viewer_token or secrets.token_urlsafe(32)
+        self.control_token = control_token or secrets.token_urlsafe(32)
         self.on_empty = on_empty
 
         # Queue
@@ -551,13 +553,21 @@ class RoomManager:
                 continue
 
             viewer_token = document.get("viewer_token")
+            control_token = document.get("control_token")
             if not isinstance(viewer_token, str) or not viewer_token:
                 viewer_token = secrets.token_urlsafe(32)
+            if not isinstance(control_token, str) or not control_token:
+                control_token = secrets.token_urlsafe(32)
+            if (
+                viewer_token != document.get("viewer_token")
+                or control_token != document.get("control_token")
+            ):
                 await self.repository.create(
                     room_id=room_id,
                     name=document.get("name", "Private Room"),
                     controllers=document.get("controllers", []),
                     viewer_token=viewer_token,
+                    control_token=control_token,
                 )
 
             room = Room(
@@ -566,6 +576,7 @@ class RoomManager:
                 document.get("controllers", []),
                 self.remove,
                 viewer_token=viewer_token,
+                control_token=control_token,
             )
 
             self.rooms[room_id] = room
@@ -597,12 +608,14 @@ class RoomManager:
             )
 
         viewer_token = secrets.token_urlsafe(32)
+        control_token = secrets.token_urlsafe(32)
         room = Room(
             room_id,
             name,
             controllers,
             self.remove,
             viewer_token=viewer_token,
+            control_token=control_token,
         )
 
         self.rooms[room_id] = room
@@ -613,6 +626,7 @@ class RoomManager:
                 name=name,
                 controllers=controllers,
                 viewer_token=viewer_token,
+                control_token=control_token,
             )
 
         except Exception:
