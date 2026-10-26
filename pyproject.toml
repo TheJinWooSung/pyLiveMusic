@@ -10,7 +10,7 @@ description = "A Python framework for private live-audio rooms using WebRTC."
 readme = "README.md"
 requires-python = ">=3.10, <=3.14.7"
 
-license = "GPL-3.0-only"
+license = "GPL-3.0-or-later"
 license-files = ["LICENSE"]
 
 authors = [
@@ -27,7 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 ]
 
 dependencies = [
