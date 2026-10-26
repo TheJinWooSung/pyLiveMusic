@@ -47,23 +47,17 @@ from _core._aiohttp._endpoints import register_endpoint
 
 async def on_startup(app):
     state = app["state"]
-    
     logs.info("Starting server...")
-    
     await state.storage.connect()
     await state.rooms.start()
 
- 
+
 async def on_shutdown(app):
     state = app["state"]
-
     logs.info("Shutting down...")
-    
     await state.rooms.shutdown()
     await state.storage.close()
-    
     logs.info("Server stopped")
-
 
 
 def create_app(auth, state, endpoints=None):
@@ -71,20 +65,18 @@ def create_app(auth, state, endpoints=None):
     app["auth"] = auth
     app["state"] = state
 
-    logs.info("Auth Key: " + app["auth"]._get_auth_key())
-    
+    # Never log the bearer token: logs are commonly forwarded to third parties.
+    logs.info("API authentication is enabled.")
+
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
 
-    # Frontend
     endpoints = endpoints or {}
 
     if frontend.room not in endpoints:
         app.router.add_get(
             frontend.room,
-            lambda request: web.FileResponse(
-                STATIC_DIR / "audio.html"
-            ),
+            lambda request: web.FileResponse(STATIC_DIR / "audio.html"),
         )
 
     app.router.add_static(frontend.static, STATIC_DIR)
@@ -92,12 +84,10 @@ def create_app(auth, state, endpoints=None):
     for endpoint in endpoints.values():
         register_endpoint(app, endpoint)
 
-    # Rooms
     app.router.add_get(rooms.get_room, get_room)
     app.router.add_post(rooms.end_room, end_room)
     app.router.add_post(rooms.create_room, create_room)
 
-    # Playback 
     app.router.add_post(playback.pause, pause)
     app.router.add_post(playback.resume, resume)
     app.router.add_post(playback.skip, skip)
@@ -110,13 +100,11 @@ def create_app(auth, state, endpoints=None):
     app.router.add_post(playback.seek_back, seek_back)
     app.router.add_post(playback.quality, quality)
 
-    # Queue
     app.router.add_get(queue.get_queue, get_queue)
     app.router.add_post(queue.add_track, add_track)
     app.router.add_post(queue.remove_track, remove_track)
     app.router.add_post(queue.clear_queue, clear_queue)
 
-    # WebRTC signaling
     app.router.add_post(webrtc.offer, offer)
     app.router.add_post(
         "/api/rooms/{room_id}/webrtc/candidate",
@@ -124,7 +112,6 @@ def create_app(auth, state, endpoints=None):
     )
 
     return app
-
 
 
 async def _start(host, port, auth, storage, endpoints=None):
@@ -135,17 +122,10 @@ async def _start(host, port, auth, storage, endpoints=None):
     )
 
     runner = web.AppRunner(app)
-
     await runner.setup()
 
-    site = web.TCPSite(
-        runner,
-        host,
-        port,
-    )
-
+    site = web.TCPSite(runner, host, port)
     await site.start()
 
     logs.info(f"Server started on http://{host}:{port}")
-
     return runner
