@@ -3,11 +3,12 @@ class MongoRoomRepository:
     def __init__(self, collection):
         self.collection = collection
 
-    async def create(self, room_id, name, controllers):
+    async def create(self, room_id, name, controllers, viewer_token=None):
         document = {
             "_id": room_id,
             "name": name,
             "controllers": list(controllers),
+            "viewer_token": viewer_token,
         }
 
         await self.collection.replace_one(
