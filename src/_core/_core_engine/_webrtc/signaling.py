@@ -13,6 +13,7 @@ async def offer(request):
         if room is None:
             raise web.HTTPNotFound(text="Room not found")
 
+        request.app["auth"]._verify_room_access(request, room)
         data = await request.json()
 
         sdp = data.get("sdp")
@@ -54,6 +55,7 @@ async def candidate(request):
                 text="Room not found"
             )
 
+        request.app["auth"]._verify_room_access(request, room)
         data = await request.json()
 
         peer_id = data.get("peer_id")
