@@ -6,11 +6,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyLiveMusic"
 dynamic = ["version"]
-description = "A python framework for creating private room for live streaming audio using webrtc."
+description = "A Python framework for private live-audio rooms using WebRTC."
 readme = "README.md"
 requires-python = ">=3.10, <=3.14.7"
 
-license = "MIT"
+license = "GPL-3.0-only"
 license-files = ["LICENSE"]
 
 authors = [
@@ -27,6 +27,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 
 dependencies = [
@@ -55,12 +56,10 @@ version = {attr = "pyLiveMusic.__version__"}
 [tool.setuptools.packages.find]
 where = ["src"]
 
-
 [tool.setuptools.package-data]
 pyLiveMusic = ["_static/*.html", "_static/*.js"]
 
-
 [project.urls]
-Homepage = "https://github.com/Bakachii/pyLiveMusic"
-Repository = "https://github.com/Bakachii/pyLiveMusic"
-Issues = "https://github.com/Bakachii/pyLiveMusic/issues"
+Homepage = "https://github.com/TheJinWooSung/pyLiveMusic"
+Repository = "https://github.com/TheJinWooSung/pyLiveMusic"
+Issues = "https://github.com/TheJinWooSung/pyLiveMusic/issues"
