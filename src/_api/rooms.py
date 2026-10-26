@@ -4,16 +4,10 @@ from aiohttp import web
 async def create_room(request):
     request.app["auth"]._verify(request)
     user_id = request.app["auth"]._get_auth_key()
-
     data = await request.json()
 
-    name = data.get(
-        "name",
-        "Private Room",
-    )
-
+    name = data.get("name", "Private Room")
     room_id = data.get("room_id")
-
     rooms = request.app["state"].rooms
 
     room = await rooms.create(
@@ -22,12 +16,12 @@ async def create_room(request):
         room_id=room_id,
     )
 
-    return web.json_response(
-        room.state(),
-        status=201,
-    )
+    return web.json_response(room.state(), status=201)
+
 
 async def get_room(request):
+    request.app["auth"]._verify(request)
+
     room_id = request.match_info["room_id"]
     room = request.app["state"].rooms.get(room_id)
 
@@ -37,9 +31,7 @@ async def get_room(request):
     return web.json_response(room.state())
 
 
-
 async def end_room(request):
-    
     request.app["auth"]._verify(request)
 
     room_id = request.match_info["room_id"]
@@ -50,5 +42,4 @@ async def end_room(request):
         raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
 
     await rooms.remove(room_id)
-
     return web.json_response({"status": "ended"})
