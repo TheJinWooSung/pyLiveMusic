@@ -6,6 +6,7 @@ const roomId = window.location.pathname
     .split("/")
     .filter(Boolean)
     .pop();
+const roomToken = window.location.hash.slice(1);
 
 let peerConnection = null;
 let serverPosition = 0;
@@ -183,8 +184,8 @@ async function connectWebRTC() {
                         method: "POST",
 
                         headers: {
-                            "Content-Type":
-                                "application/json"
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${roomToken}`
                         },
 
                         body: JSON.stringify({
@@ -384,8 +385,8 @@ async function connectWebRTC() {
                 method: "POST",
 
                 headers: {
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${roomToken}`
                 },
 
                 body: JSON.stringify({
@@ -453,7 +454,12 @@ async function updateServerPosition() {
     try {
         const response =
             await fetch(
-                `/api/rooms/${roomId}`
+                `/api/rooms/${roomId}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${roomToken}`
+                    }
+                }
             );
 
 
@@ -556,9 +562,12 @@ function stopStatePolling() {
 
 async function initialize() {
     if (!roomId) {
-        status.textContent =
-            "INVALID ROOM";
+        status.textContent = "INVALID ROOM";
+        return;
+    }
 
+    if (!roomToken) {
+        status.textContent = "OPEN THE PRIVATE PLAYER LINK";
         return;
     }
 
