@@ -2,11 +2,11 @@ from aiohttp import web
 
 
 async def get_queue(request):
-    request.app["auth"]._verify(request)
-
     room = request.app["state"].rooms.get(request.match_info["room_id"])
     if room is None:
         raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
+
+    request.app["auth"]._verify_room_control(request, room)
 
     return web.json_response({
         "room_id": room.id,
