@@ -16,18 +16,20 @@ async def create_room(request):
         room_id=room_id,
     )
 
-    return web.json_response(room.state(), status=201)
+    result = room.state()
+    result["player_token"] = room.viewer_token
+    result["player_path"] = f"/room/{room.id}#{room.viewer_token}"
+    return web.json_response(result, status=201)
 
 
 async def get_room(request):
-    # Public read is currently required by the built-in browser player,
-    # which polls this endpoint without an Authorization header.
     room_id = request.match_info["room_id"]
     room = request.app["state"].rooms.get(room_id)
 
     if room is None:
         raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
 
+    request.app["auth"]._verify_room_access(request, room)
     return web.json_response(room.state())
 
 
