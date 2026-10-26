@@ -18,7 +18,7 @@ Authenticated endpoints require a Bearer token:
 Authorization: Bearer <key>
 ```
 
-Replace `<key>` with the authentication key printed when the server starts.
+Replace `<key>` with the same `AUTH_KEY` configured for the server and caller. The key is never printed to logs; if omitted, the client generates a random key at startup.
 
 ---
 
@@ -26,7 +26,7 @@ Replace `<key>` with the authentication key printed when the server starts.
 
 ## Create a room
 
-Creates a new live room and persists its room metadata using the configured repository.
+Creates a live room and persists its metadata. The response includes `player_token` and `player_path`; share `https://your-host.example` + `player_path` with listeners. Keep the invite private.
 
 ```bash
 curl -X POST http://localhost:8000/api/rooms \
