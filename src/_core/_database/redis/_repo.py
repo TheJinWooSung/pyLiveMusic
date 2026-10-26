@@ -11,12 +11,13 @@ class RedisRoomRepository:
     def _room_key(self, room_id):
         return f"{self.rooms_key}:{room_id}"
 
-    async def create(self, room_id, name, controllers):
+    async def create(self, room_id, name, controllers, viewer_token=None):
 
         document = {
             "_id": room_id,
             "name": name,
             "controllers": list(controllers),
+            "viewer_token": viewer_token,
         }
 
         await self.redis.set(
