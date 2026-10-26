@@ -48,6 +48,14 @@ if __name__ == "__main__":
 - Keep control credentials private and share player invite links only with intended listeners. Use HTTPS in production; anyone with a player invite can listen to that room.
 - Only provide track paths from trusted sources. The queue API accepts a server-side file path; never let untrusted users submit arbitrary paths.
 
+## Tests
+
+Run the focused authentication and queue authorization tests from the repository root:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests -v
+```
+
 ## Documentation
 
 - [cURL API reference](docs/curl_methods_for_interaction/README.md) — HTTP endpoint reference.
