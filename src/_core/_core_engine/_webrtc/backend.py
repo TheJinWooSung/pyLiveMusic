@@ -1,6 +1,7 @@
 import uuid
 import random
 import asyncio
+import secrets
 from dataclasses import dataclass
 
 from aiortc import RTCSessionDescription
@@ -27,11 +28,13 @@ class Room:
         name,
         controllers,
         on_empty,
+        viewer_token=None,
     ):
         self.id = room_id
         self.name = name
 
         self.controllers = set(controllers)
+        self.viewer_token = viewer_token or secrets.token_urlsafe(32)
         self.on_empty = on_empty
 
         # Queue
@@ -547,17 +550,22 @@ class RoomManager:
             if room_id in self.rooms:
                 continue
 
+            viewer_token = document.get("viewer_token")
+            if not isinstance(viewer_token, str) or not viewer_token:
+                viewer_token = secrets.token_urlsafe(32)
+                await self.repository.create(
+                    room_id=room_id,
+                    name=document.get("name", "Private Room"),
+                    controllers=document.get("controllers", []),
+                    viewer_token=viewer_token,
+                )
+
             room = Room(
                 room_id,
-                document.get(
-                    "name",
-                    "Private Room",
-                ),
-                document.get(
-                    "controllers",
-                    [],
-                ),
+                document.get("name", "Private Room"),
+                document.get("controllers", []),
                 self.remove,
+                viewer_token=viewer_token,
             )
 
             self.rooms[room_id] = room
@@ -588,11 +596,13 @@ class RoomManager:
                 f"Room '{room_id}' already exists."
             )
 
+        viewer_token = secrets.token_urlsafe(32)
         room = Room(
             room_id,
             name,
             controllers,
             self.remove,
+            viewer_token=viewer_token,
         )
 
         self.rooms[room_id] = room
@@ -602,6 +612,7 @@ class RoomManager:
                 room_id=room_id,
                 name=name,
                 controllers=controllers,
+                viewer_token=viewer_token,
             )
 
         except Exception:
