@@ -36,3 +36,23 @@ class Authentication:
             )
 
         return True
+
+    def _verify_room_access(self, request, room) -> bool:
+        """Allow the server API key or this room's viewer credential."""
+        provided_key = request.headers.get("Authorization", "")
+        if not provided_key:
+            raise web.HTTPUnauthorized(
+                text="Room access credential required",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        accepted = (
+            f"Bearer {self.auth_key}",
+            f"Bearer {getattr(room, 'viewer_token', '')}",
+        )
+        if not any(hmac.compare_digest(provided_key, key) for key in accepted if key != "Bearer "):
+            raise web.HTTPUnauthorized(
+                text="Invalid room access credential",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return True
