@@ -10,12 +10,12 @@ def get_room(request):
     if room is None:
         raise web.HTTPNotFound(text="ROOM_NOT_FOUND")
 
+    request.app["auth"]._verify_room_control(request, room)
     return room
 
 
 async def pause(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
 
     try:
@@ -28,7 +28,6 @@ async def pause(request):
 
 async def resume(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
 
     try:
@@ -41,7 +40,6 @@ async def resume(request):
 
 async def skip(request):
     
-    request.app["auth"]._verify(request)
     room = get_room(request)
 
     try:
@@ -54,7 +52,6 @@ async def skip(request):
 
 async def volume(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
     data = await request.json()
 
@@ -79,7 +76,6 @@ async def volume(request):
 
 async def shuffle(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
     data = await request.json()
 
@@ -90,7 +86,6 @@ async def shuffle(request):
 
 async def repeat(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
     data = await request.json()
 
@@ -115,7 +110,6 @@ async def repeat(request):
 
 async def ascending(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
 
     try:
@@ -128,7 +122,6 @@ async def ascending(request):
 
 async def descending(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
 
     try:
@@ -141,7 +134,6 @@ async def descending(request):
 
 async def seek_front(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
     data = await request.json()
 
@@ -166,7 +158,6 @@ async def seek_front(request):
 
 async def seek_back(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
     data = await request.json()
 
@@ -190,7 +181,6 @@ async def seek_back(request):
 
 async def quality(request):
 
-    request.app["auth"]._verify(request)
     room = get_room(request)
     data = await request.json()
 
