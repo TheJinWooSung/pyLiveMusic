@@ -39,13 +39,13 @@ if __name__ == "__main__":
 
 ## Authentication and deployment notes
 
-- Control endpoints require an `Authorization: Bearer <AUTH_KEY>` header.
+- Control endpoints accept the server-wide `Authorization: Bearer <AUTH_KEY>` credential or the room-specific `control_token` returned when creating a room.
 - Do not publish the key, commit it to source control, or print it in logs.
 - If another service needs to call the API, configure the same strong `AUTH_KEY` in the server and caller.
 - Serve the application behind HTTPS in production.
-- Room creation returns a one-time-to-share player credential (`player_token`) and a relative invite path (`player_path`). Share the path as `https://your-host.example` + `player_path`; its `#token` fragment is read by the browser and sent only in authorization headers.
-- The browser player requires the room-specific credential for room-state reads and WebRTC signaling. The server-wide `AUTH_KEY` remains required for room creation, playback controls, and queue management.
-- Keep player invite links private and use HTTPS in production. Anyone with a room invite link can listen to that room; the token is not a substitute for user identity or revocation.
+- Room creation returns separate credentials: `control_token` for playback/queue/room controls, and `player_token` plus `player_path` for listeners. Share `https://your-host.example` + `player_path` with listeners; its `#token` fragment is read by the browser and sent only in authorization headers.
+- The browser player requires a valid room credential for room-state reads and WebRTC signaling. Control endpoints accept either the server-wide `AUTH_KEY` or that room’s `control_token`.
+- Keep control credentials private and share player invite links only with intended listeners. Use HTTPS in production; anyone with a player invite can listen to that room.
 - Only provide track paths from trusted sources. The queue API accepts a server-side file path; never let untrusted users submit arbitrary paths.
 
 ## Documentation
